@@ -5,6 +5,7 @@
 #include "../driver/ServerDriver.h"
 #include "../hooks/IVRServerDriverHost004Hooks.h"
 #include "../hooks/IVRServerDriverHost005Hooks.h"
+#include "../hooks/IVRServerDriverHost006Hooks.h"
 #include "../hooks/IVRControllerComponent001Hooks.h"
 #include "../hooks/IVRDriverInput001Hooks.h"
 
@@ -162,6 +163,8 @@ void DeviceManipulationHandle::ll_sendPoseUpdate(const vr::DriverPose_t& newPose
 		IVRServerDriverHost004Hooks::trackedDevicePoseUpdatedOrig(m_deviceDriverHostPtr, m_openvrId, newPose, sizeof(vr::DriverPose_t));
 	} else if (m_deviceDriverInterfaceVersion == 5) {
 		IVRServerDriverHost005Hooks::trackedDevicePoseUpdatedOrig(m_deviceDriverHostPtr, m_openvrId, newPose, sizeof(vr::DriverPose_t));
+	} else if (m_deviceDriverInterfaceVersion == 6) {
+		IVRServerDriverHost006Hooks::trackedDevicePoseUpdatedOrig(m_deviceDriverHostPtr, m_openvrId, newPose, sizeof(vr::DriverPose_t));
 	}
 }
 
@@ -184,7 +187,7 @@ void DeviceManipulationHandle::ll_sendButtonEvent(ButtonEventType eventType, vr:
 		default:
 			break;
 		}
-	} else if (m_deviceDriverInterfaceVersion == 5) {
+	} else if (m_deviceDriverInterfaceVersion == 5 || m_deviceDriverInterfaceVersion == 6) {
 		auto it = _ButtonIdToComponentHandleMap.find(eButtonId);
 		if (it != _ButtonIdToComponentHandleMap.end()) {
 			uint64_t componentHandle = 0;
@@ -222,7 +225,7 @@ void DeviceManipulationHandle::ll_sendButtonEvent(ButtonEventType eventType, vr:
 void DeviceManipulationHandle::ll_sendAxisEvent(uint32_t unWhichAxis, const vr::VRControllerAxis_t& axisState) {
 	if (m_deviceDriverInterfaceVersion == 4) {
 		IVRServerDriverHost004Hooks::trackedDeviceAxisUpdatedOrig(m_deviceDriverHostPtr, m_openvrId, unWhichAxis, axisState);
-	} else if (m_deviceDriverInterfaceVersion == 5) {
+	} else if (m_deviceDriverInterfaceVersion == 5 || m_deviceDriverInterfaceVersion == 6) {
 		if (unWhichAxis < 5) {
 			if (_AxisIdToComponentHandleMap[unWhichAxis].first == 0 && _AxisIdToComponentHandleMap[unWhichAxis].second == 0) {
 				LOG(WARNING) << "Device " << m_openvrId << ": No mapping from axis id " << unWhichAxis << " to input component.";
@@ -242,7 +245,7 @@ void DeviceManipulationHandle::ll_sendAxisEvent(uint32_t unWhichAxis, const vr::
 bool DeviceManipulationHandle::ll_triggerHapticPulse(uint32_t unAxisId, uint16_t usPulseDurationMicroseconds) {
 	if (m_deviceDriverInterfaceVersion == 4 && m_controllerComponentHooks) {
 		return std::static_pointer_cast<IVRControllerComponent001Hooks>(m_controllerComponentHooks)->triggerHapticPulseOrig(unAxisId, usPulseDurationMicroseconds);
-	} else if (m_deviceDriverInterfaceVersion == 5) {
+	} else if (m_deviceDriverInterfaceVersion == 5 || m_deviceDriverInterfaceVersion == 6) {
 		
 		struct VREvent_HapticVibration_t {
 			uint64_t containerHandle; // property container handle of the device with the haptic component
@@ -271,7 +274,7 @@ bool DeviceManipulationHandle::ll_triggerHapticPulse(uint32_t unAxisId, uint16_t
 bool DeviceManipulationHandle::ll_sendHapticPulseEvent(float fDurationSeconds, float fFrequency, float fAmplitude) {
 	if (m_deviceDriverInterfaceVersion == 4 && m_controllerComponentHooks) {
 		return std::static_pointer_cast<IVRControllerComponent001Hooks>(m_controllerComponentHooks)->triggerHapticPulseOrig(0, (uint16_t)(fDurationSeconds * 1E6));
-	} else if (m_deviceDriverInterfaceVersion == 5) {
+	} else if (m_deviceDriverInterfaceVersion == 5 || m_deviceDriverInterfaceVersion == 6) {
 
 		struct VREvent_HapticVibration_t {
 			uint64_t containerHandle; // property container handle of the device with the haptic component
@@ -298,7 +301,7 @@ bool DeviceManipulationHandle::ll_sendHapticPulseEvent(float fDurationSeconds, f
 
 
 void DeviceManipulationHandle::ll_sendScalarComponentUpdate(vr::VRInputComponentHandle_t ulComponent, float fNewValue, double fTimeOffset) {
-	if (m_deviceDriverInterfaceVersion == 5) {
+	if (m_deviceDriverInterfaceVersion == 5 || m_deviceDriverInterfaceVersion == 6) {
 		IVRDriverInput001Hooks::updateScalarComponentOrig(m_driverInputPtr, ulComponent, fNewValue, fTimeOffset);
 	} else if (m_deviceDriverInterfaceVersion == 4) {
 		auto it = _componentHandleToAxisIdMap.find(ulComponent);

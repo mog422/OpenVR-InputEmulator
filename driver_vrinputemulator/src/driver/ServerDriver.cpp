@@ -28,7 +28,7 @@ ServerDriver::~ServerDriver() {
 
 
 bool ServerDriver::hooksTrackedDevicePoseUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::DriverPose_t& newPose, uint32_t& unPoseStructSize) {
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
+	if (unWhichDevice < vr::k_unMaxTrackedDeviceCount && _openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
 		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handlePoseUpdate(unWhichDevice, newPose, unPoseStructSize);
 	}
 	return true;
@@ -37,7 +37,7 @@ bool ServerDriver::hooksTrackedDevicePoseUpdated(void* serverDriverHost, int ver
 
 bool ServerDriver::hooksTrackedDeviceButtonPressed(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::EVRButtonId& eButtonId, double& eventTimeOffset) {
 	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceButtonPressed(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)eButtonId << ", " << eventTimeOffset << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
+	if (unWhichDevice < vr::k_unMaxTrackedDeviceCount && _openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
 		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleButtonEvent(unWhichDevice, ButtonEventType::ButtonPressed, eButtonId, eventTimeOffset);
 	}
 	return true;
@@ -45,7 +45,7 @@ bool ServerDriver::hooksTrackedDeviceButtonPressed(void* serverDriverHost, int v
 
 bool ServerDriver::hooksTrackedDeviceButtonUnpressed(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::EVRButtonId& eButtonId, double& eventTimeOffset) {
 	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceButtonUnpressed(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)eButtonId << ", " << eventTimeOffset << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
+	if (unWhichDevice < vr::k_unMaxTrackedDeviceCount && _openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
 		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleButtonEvent(unWhichDevice, ButtonEventType::ButtonUnpressed, eButtonId, eventTimeOffset);
 	}
 	return true;
@@ -61,7 +61,7 @@ bool ServerDriver::hooksTrackedDeviceButtonTouched(void* serverDriverHost, int v
 
 bool ServerDriver::hooksTrackedDeviceButtonUntouched(void* serverDriverHost, int version, uint32_t& unWhichDevice, vr::EVRButtonId& eButtonId, double& eventTimeOffset) {
 	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceButtonUntouched(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)eButtonId << ", " << eventTimeOffset << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
+	if (unWhichDevice < vr::k_unMaxTrackedDeviceCount && _openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
 		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleButtonEvent(unWhichDevice, ButtonEventType::ButtonUntouched, eButtonId, eventTimeOffset);
 	}
 	return true;
@@ -69,7 +69,7 @@ bool ServerDriver::hooksTrackedDeviceButtonUntouched(void* serverDriverHost, int
 
 bool ServerDriver::hooksTrackedDeviceAxisUpdated(void* serverDriverHost, int version, uint32_t& unWhichDevice, uint32_t& unWhichAxis, vr::VRControllerAxis_t& axisState) {
 	LOG(TRACE) << "ServerDriver::hooksTrackedDeviceAxisUpdated(" << serverDriverHost << ", " << version << ", " << unWhichDevice << ", " << (int)unWhichAxis << ")";
-	if (_openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
+	if (unWhichDevice < vr::k_unMaxTrackedDeviceCount && _openvrIdToDeviceManipulationHandleMap[unWhichDevice] && _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->isValid()) {
 		return _openvrIdToDeviceManipulationHandleMap[unWhichDevice]->handleAxisUpdate(unWhichDevice, unWhichAxis, axisState);
 	}
 	return true;
